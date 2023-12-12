@@ -3,6 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
 import glob
+import re
 
 if 'GOOGLE_CREDENTIALS' not in os.environ:
     raise ValueError("The environment variable 'GOOGLE_CREDENTIALS' is not found.")
@@ -13,7 +14,6 @@ except json.JSONDecodeError as e:
     raise ValueError("The environment variable 'GOOGLE_CREDENTIALS' is not in a valid JSON format.") from e
 
 # Setting up Google Authentication Credentials
-creds_json = json.loads(os.environ['GOOGLE_CREDENTIALS'])
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json)
 client = gspread.authorize(creds)
 
@@ -37,10 +37,14 @@ for file_path in testcase_files:
 
     with open(file_path, 'r') as file:
         content = file.read()
-        test_cases_data.append([filename, item1, item2, content])
+        # Extract the tags section using regular expression
+        tags_match = re.search(r'(?<=\n### Tags\n).+', content, re.DOTALL)
+        tags = tags_match.group(0).strip() if tags_match else ""
+        content_cleaned = re.sub(r'### Tags.*', '', content, flags=re.DOTALL)
+        test_cases_data.append([filename, item1, item2, content_cleaned, tags])
 
 # Write headers to the spreadsheet
-worksheet.update('A1', [['Filename', 'Item1', 'Item2', 'Content']])
+worksheet.update('A1', [['Filename', 'Item1', 'Item2', 'Content, Tags']])
 
 # Write test case data to the spreadsheet
 if test_cases_data:
