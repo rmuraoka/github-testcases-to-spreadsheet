@@ -1,0 +1,30 @@
+name: Update Spreadsheet
+
+on:
+  push:
+    paths:
+      - 'testcases/**'
+
+jobs:
+  update-spreadsheet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install gspread oauth2client
+
+      - name: Run script to update spreadsheet
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          WORKSHEET_TITLE: ${{ secrets.WORKSHEET_TITLE }}
+        run: |
+          python script_to_update_spreadsheet.py
