@@ -21,7 +21,7 @@ client = gspread.authorize(creds)
 spreadsheet = client.open_by_key(os.environ['SPREADSHEET_ID'])
 
 # Select a Specific Worksheet
-worksheet = spreadsheet.worksheet('os.environ['WORKSHEET_TITLE'])
+worksheet = spreadsheet.worksheet(os.environ['WORKSHEET_TITLE'])
 
 # Load all test case files in the 'testcases' folder
 testcases_folder = './testcases/'
